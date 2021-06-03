@@ -1,8 +1,19 @@
+const path = require('path');
+
 module.exports = {
-  entry: "./app/main",
-  mode: "development",
+  mode: 'development',
+  entry: ['babel-polyfill', './app/index.js'],
   output: {
-    path: __dirname,
-    filename: "./public/bundle.js",
+    path: path.resolve(__dirname, 'public'),
+    filename: 'bundle.js'
   },
-};
+  module: {
+    rules: [
+      {
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+      },
+    ],
+  },
+}

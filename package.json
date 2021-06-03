@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start-dev": "npm run start-server",
-    "start-server": "nodemon main.js -e html,js,css --ignore public",
+    "start-dev": "npm run build-watch & npm run start-server",
+    "start-server": "nodemon main.js -e html,js,css",
+    "build": "webpack",
     "build-watch": "webpack -w",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "echo 'Running server for production - developers, use npm run start-dev for development' && node main",
@@ -37,12 +38,19 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "react-webcam": "^5.2.4",
+    "seedrandom": "^3.0.5",
     "sequelize": "^6.6.2",
-    "sequelize-cli": "^6.2.0",
     "volleyball": "^1.5.1",
     "web-vitals": "^1.1.2"
   },
   "devDependencies": {
+    "@babel/core": "^7.10.5",
+    "@babel/preset-env": "^7.11.0",
+    "@babel/preset-react": "^7.13.13",
+    "@babel/register": "^7.7.4",
+    "babel-loader": "^8.1.0",
+    "babel-polyfill": "^6.26.0",
+    "source-map-loader": "^1.0.0",
     "webpack": "^4.44.2",
     "webpack-cli": "^4.7.0"
   }
