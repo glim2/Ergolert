@@ -1,5 +1,6 @@
 const router = require("express").Router();
 
+router.use("/auth", require("./auth"));
 router.use("/main", require("./main"));
 
 router.use((req, res, next) => {

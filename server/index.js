@@ -1,7 +1,11 @@
 const express = require("express");
 const path = require("path");
+const volleyball = require('volleyball')
 
 const app = express();
+
+const debug = process.env.JWT === 'jwt'
+app.use(volleyball.custom({ debug }))
 
 // body parsing middleware
 app.use(express.json());

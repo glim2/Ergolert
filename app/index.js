@@ -1,9 +1,9 @@
 import React from "react";
 import ReactDom from "react-dom";
-import Routes from "./components/Routes";
+import Main from "./components/Main";
 
 const App = () => {
-  return <Routes />;
+  return <Main />;
 };
 
 ReactDom.render(<App />, document.getElementById("main"));
