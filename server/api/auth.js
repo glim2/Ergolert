@@ -14,7 +14,6 @@ router.post("/", async (req, res, next) => {
               username,
               password: user.password,
             });
-
             const token = jwt.sign({userId: userId}, 'secret');
             res.send(token);
         }

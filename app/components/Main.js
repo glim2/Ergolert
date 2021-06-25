@@ -1,5 +1,5 @@
 import React from "react";
-import {BrowserRouter as Router} from "react-router-dom";
+import {BrowserRouter as Router, Link} from "react-router-dom";
 import Login from "./Login";
 import Video from "./Video";
 import Webcam from "react-webcam";
@@ -37,7 +37,7 @@ class Main extends React.Component {
   }
 
   async signIn(credentials) {
-    let response = await axios.post('/api/auth', credentials);
+    let response = await axios.post("/api/auth", credentials);
     window.localStorage.setItem("token", response.data);
     this.attemptTokenLogin();
   }
@@ -45,34 +45,42 @@ class Main extends React.Component {
   render() {
     if (!this.state.auth.id) {
       return (
-        <div className="App">
-          <header className="App-header">
-            <h1>Welcome to Ergolert!</h1>
-          </header>
-          <Login signIn={this.signIn} />
-          <div>
-            <Webcam
-              style={{
-                position: "absolute",
-                marginLeft: "auto",
-                marginRight: "auto",
-                left: 0,
-                right: 0,
-                textAlign: "center",
-                zindez: 9,
-                width: 640,
-                height: 480,
-              }}
-            />
+        <Router>
+          <div className="App">
+            <header className="App-header">
+              <h1>Welcome to Ergolert!</h1>
+            </header>
+            <Login signIn={this.signIn} />
+            <div>
+              <Webcam
+                style={{
+                  position: "absolute",
+                  marginLeft: "auto",
+                  marginRight: "auto",
+                  left: 0,
+                  right: 0,
+                  textAlign: "center",
+                  zindex: 9,
+                  width: 640,
+                  height: 480,
+                }}
+              />
+            </div>
           </div>
-        </div>
+        </Router>
       );
     } else {
       return (
         <div>
-          <h1>Welcome {this.state.auth.username}!</h1>
-          <button onClick={this.logout}>Logout</button>
-          <Video />
+          <div>
+            <h1>Welcome {this.state.auth.firstName}!</h1>
+          </div>
+          <div>
+            <Video />
+          </div>
+          <div>
+            <button onClick={this.logout}>Logout</button>
+          </div>
         </div>
       );
     }

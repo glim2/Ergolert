@@ -3,10 +3,12 @@ import * as tf from "@tensorflow/tfjs";
 import * as posenet from "@tensorflow-models/posenet";
 import Webcam from "react-webcam";
 import {drawKeypoints, drawSkeleton} from "../utilities";
+import SetPosture from "./SetPosture";
 
 const Video = () => {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
+  let poses = []
 
   // Load posenet
   const runPosenet = async () => {
@@ -16,7 +18,7 @@ const Video = () => {
     });
     setInterval(() => {
       detect(net);
-    }, 100);
+    }, 1000);
   };
 
   const detect = async (net) => {
@@ -39,6 +41,7 @@ const Video = () => {
       console.log(pose);
 
       drawCanvas(pose, video, videoWidth, videoHeight, canvasRef);
+      poses.push(pose);
     }
   };
 
@@ -51,11 +54,9 @@ const Video = () => {
     drawSkeleton(pose["keypoints"], 0.5, ctx);
   };
 
-  runPosenet();
-
   return (
-    <div>
-      <Webcam
+    <div id='webcam'>
+      <Webcam 
         ref={webcamRef}
         style={{
           position: "absolute",
@@ -64,13 +65,13 @@ const Video = () => {
           left: 0,
           right: 0,
           textAlign: "center",
-          zindez: 9,
+          zindex: 9,
           width: 640,
           height: 480,
         }}
       />
 
-      <canvas
+      <canvas 
         ref={canvasRef}
         style={{
           position: "absolute",
@@ -79,11 +80,14 @@ const Video = () => {
           left: 0,
           right: 0,
           textAlign: "center",
-          zindez: 9,
+          zindex: 9,
           width: 640,
           height: 480,
         }}
       />
+      <div>
+        <SetPosture runPosenet={() => runPosenet()} poses={poses} />
+      </div>
     </div>
   );
 };
