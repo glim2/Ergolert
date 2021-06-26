@@ -25,6 +25,7 @@
   "dependencies": {
     "@material-ui/core": "^4.11.4",
     "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "*",
     "@tensorflow-models/posenet": "^2.2.2",
     "@tensorflow/tfjs": "^3.6.0",
     "@testing-library/jest-dom": "^5.12.0",
@@ -40,6 +41,7 @@
     "pg-hstore": "^2.3.3",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-redux": "^7.2.4",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",

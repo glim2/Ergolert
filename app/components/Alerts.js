@@ -1,6 +1,16 @@
 import React from "react";
+import {withStyles} from "@material-ui/core/styles";
+import {Button, Typography} from "@material-ui/core";
 
-let alertsArray = ["Enjoy!"];
+const styles = (theme) => ({
+  root: {
+    "& > *": {
+      margin: theme.spacing(1),
+    },
+  },
+});
+
+let alertsArray = [];
 
 class Alerts extends React.Component {
   constructor(props) {
@@ -56,50 +66,118 @@ class Alerts extends React.Component {
   }
 
   comparePosture(initialAveragePosture, poses) {
-    setInterval(() => {
-      let compared = [];
-      const currentAveragePosture = this.getAveragePosture(poses.slice(-10));
-      // console.log("initial", initialAveragePosture);
-      // console.log("current", currentAveragePosture.keypoints);
-      for (let i = 0; i < currentAveragePosture.keypoints.length; i++) {
-        if (currentAveragePosture.keypoints[i].position.y !== 0) {
-          if (currentAveragePosture.keypoints[i].position.y - initialAveragePosture.keypoints[i].position.y > 50) {
-            compared.push("low");
-          } else {compared.push("even")}
+    if (this.props.auth.id !== undefined) {
+      setInterval(() => {
+        let compared = [];
+        const currentAveragePosture = this.getAveragePosture(poses.slice(-10));
+        console.log("initial", initialAveragePosture);
+        console.log("current", currentAveragePosture.keypoints);
+        for (let i = 0; i < currentAveragePosture.keypoints.length; i++) {
+          let currentY = currentAveragePosture.keypoints[i].position.y;
+          let currentX = currentAveragePosture.keypoints[i].position.x;
+          let initialY = initialAveragePosture.keypoints[i].position.y;
+          let initialX = initialAveragePosture.keypoints[i].position.x;
+          if (currentY === 0) {
+            // compared.push(null)
+          } else {
+            if (currentY - initialY > 40 && initialX - currentX > 40) {
+              compared.push("lowRight");
+            } else if (currentY - initialY > 40 && currentX - initialX > 40) {
+              compared.push("lowLeft");
+            } else if (currentY - initialY > 40) {
+              compared.push("low");
+            } else if (
+              initialAveragePosture.keypoints[i].position.y -
+                currentAveragePosture.keypoints[i].position.y >
+              40
+            ) {
+              compared.push("high");
+            } else if (
+              initialAveragePosture.keypoints[i].position.x -
+                currentAveragePosture.keypoints[i].position.x >
+              40
+            ) {
+              compared.push("right");
+            } else if (
+              currentAveragePosture.keypoints[i].position.x -
+                initialAveragePosture.keypoints[i].position.x >
+              40
+            ) {
+              compared.push("left");
+            } else {
+              compared.push("even");
+            }
+          }
         }
-      }
-      console.log("compared --> ", compared);
-      if (compared.every((e) => e === "low")) {
-        alertsArray.push("You may be slouching! Time to sit up straight.");
-        this.setState({
-          alerts: alertsArray,
-        });
-      }
-    }, 5000 /*this.props.alertInterval*/);
+        console.log("compared --> ", compared);
+        if (compared.every((e) => e === "low" || null)) {
+          alertsArray.push("You may be slouching! Time to sit up straight.");
+          this.setState({
+            alerts: alertsArray,
+          });
+        } else if (compared.every((e) => e === "high" || null)) {
+          alertsArray.push(
+            "Are you too close to the screen? Sit back a little!"
+          );
+          this.setState({
+            alerts: alertsArray,
+          });
+        } else if (compared.every((e) => e === "right" || null)) {
+          alertsArray.push(
+            "I think you are off centered to the RIGHT. Let's move back to the center."
+          );
+          this.setState({
+            alerts: alertsArray,
+          });
+        } else if (compared.every((e) => e === "left" || null)) {
+          alertsArray.push(
+            "I think you are off centered to the LEFT. Let's move back to the center."
+          );
+          this.setState({
+            alerts: alertsArray,
+          });
+        } else if (compared.every((e) => e === "lowRight" || null)) {
+          alertsArray.push(
+            "You may be leaning to the Right. Try to straighten your body."
+          );
+          this.setState({
+            alerts: alertsArray,
+          });
+        } else if (compared.every((e) => e === "lowLeft" || null)) {
+          alertsArray.push(
+            "You may be leaning to the LEFT. Try to straighten your body."
+          );
+          this.setState({
+            alerts: alertsArray,
+          });
+        }
+      }, 5000 /*this.props.alertInterval*/);
+    }
   }
 
   endSession() {
-    alertsArray = ["Enjoy!"];
+    alertsArray = [];
     this.setState({
       alerts: alertsArray,
     });
   }
 
   render() {
+    const {classes} = this.props;
     return (
       <div>
-        <div>
-          <h2>Alerts:</h2>
+        <div className={classes.root}>
+          <Typography variant="h5" fontWeight="fontWeightBold">Alerts:</Typography>
           {alertsArray.map((alert) => (
-            <p key={alertsArray.indexOf(alert)}>{alert}</p>
+            <Typography variant="body1" key={alertsArray.indexOf(alert)}>{alert}</Typography>
           ))}
         </div>
         <form onClick={this.endSession}>
-          <button type="button">End Session</button>
+          <Button variant="contained" color="primary">End Session</Button>
         </form>
       </div>
     );
   }
 }
 
-export default Alerts;
+export default withStyles(styles)(Alerts);

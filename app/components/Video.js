@@ -5,7 +5,7 @@ import Webcam from "react-webcam";
 import {drawKeypoints, drawSkeleton} from "../utilities";
 import SetPosture from "./SetPosture";
 
-const Video = () => {
+const Video = (props) => {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
   let poses = []
@@ -18,7 +18,7 @@ const Video = () => {
     });
     setInterval(() => {
       detect(net);
-    }, 1000);
+    }, 600);
   };
 
   const detect = async (net) => {
@@ -86,7 +86,7 @@ const Video = () => {
         }}
       />
       <div>
-        <SetPosture runPosenet={() => runPosenet()} poses={poses} />
+        <SetPosture runPosenet={() => runPosenet()} poses={poses} auth={props.auth} />
       </div>
     </div>
   );

@@ -1,5 +1,15 @@
 import React from "react";
+import {withStyles} from "@material-ui/core/styles";
+import {Button, Typography} from "@material-ui/core";
 import AlertIntervals from "./AlertIntervals";
+
+const styles = (theme) => ({
+  root: {
+    "& > *": {
+      margin: theme.spacing(1),
+    },
+  },
+});
 
 class SetPosture extends React.Component {
   constructor(props) {
@@ -10,11 +20,11 @@ class SetPosture extends React.Component {
       postureSet: false,
       runPosenet: false,
       averagePostureSet: false,
-      pleaseWait: ''
+      pleaseWait: "",
     };
     this.handleSetPosture = this.handleSetPosture.bind(this);
     this.handleResetPosture = this.handleResetPosture.bind(this);
-    this.handleClick = this.handleClick.bind(this)
+    this.handleClick = this.handleClick.bind(this);
   }
 
   handleSetPosture(evt) {
@@ -22,18 +32,27 @@ class SetPosture extends React.Component {
     if (!this.state.runPosenet) {
       this.props.runPosenet();
     }
-    this.setInitialPosture(this.props.poses)
+    this.setInitialPosture(this.props.poses);
   }
 
   handleResetPosture(evt) {
     evt.preventDefault();
-    this.setState({initialPosture: [], postureSet: false, averagePostureSet: false, pleaseWait: ''})
+    this.setState({
+      initialPosture: [],
+      postureSet: false,
+      averagePostureSet: false,
+      pleaseWait: "",
+    });
   }
 
   setInitialPosture(poses) {
     if (poses.length > 5) {
-      poses = poses.slice(-5)
-      this.setState({initialPosture: poses, postureSet: true, runPosenet: true});
+      poses = poses.slice(-5);
+      this.setState({
+        initialPosture: poses,
+        postureSet: true,
+        runPosenet: true,
+      });
     }
     this.setState({initialPosture: poses, postureSet: true, runPosenet: true});
   }
@@ -79,49 +98,68 @@ class SetPosture extends React.Component {
         keypoint.position.y = keypoint.position.y / initialPosture.length;
         return keypoint;
       });
-      this.setState({initialAveragePosture: averagePosture, averagePostureSet: true})
+      this.setState({
+        initialAveragePosture: averagePosture,
+        averagePostureSet: true,
+      });
     }, 5000);
   }
 
   handleClick() {
-    this.setState({pleaseWait: 'Please wait 5 seconds while our algorithms load :).'})
-    this.getInitialAveragePosture(this.state.initialPosture)
+    this.setState({
+      pleaseWait: "Please wait 5 seconds while our algorithms load :).",
+    });
+    this.getInitialAveragePosture(this.state.initialPosture);
   }
 
   render() {
-    console.log("this is the new state --> ", this.state);
+    const {classes} = this.props;
     if (!this.state.postureSet) {
       return (
         <div>
-          <form onClick={this.handleSetPosture}>
-            <button type="button">Set Posture</button>
+          <form className={classes.root} onClick={this.handleSetPosture}>
+            <Button variant="contained" color="primary">
+              Set Posture
+            </Button>
           </form>
         </div>
       );
     } else {
       if (!this.state.averagePostureSet) {
-      return (
-        <div>
-          <p>Your posture is set! Click Begin to start working.</p>
-          <form>
-            <button type="button" onClick={this.handleClick}>Begin</button>
-            <p>{this.state.pleaseWait}</p>
-          </form>
-        </div>
-      )
+        return (
+          <div>
+            <Typography variant="body1">Your posture is set! Click Begin to start working.</Typography>
+            <form className={classes.root}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={this.handleClick}
+              >
+                Begin
+              </Button>
+              <Typography variant="body1">{this.state.pleaseWait}</Typography>
+            </form>
+          </div>
+        );
       } else {
         return (
           <div>
-            <h2>Enjoy!</h2>
-            <form onClick={this.handleResetPosture}>
-              <button type="button">Reset Posture</button>
+            <Typography variant="h5">Enjoy!</Typography>
+            <form className={classes.root} onClick={this.handleResetPosture}>
+              <Button variant="contained" color="primary">
+                Reset Posture
+              </Button>
             </form>
-            <AlertIntervals initialAveragePosture={this.state.initialAveragePosture} poses={this.props.poses} />
+            <AlertIntervals
+              initialAveragePosture={this.state.initialAveragePosture}
+              poses={this.props.poses}
+              auth={this.props.auth}
+            />
           </div>
-        )
+        );
       }
     }
   }
 }
 
-export default SetPosture;
+export default withStyles(styles)(SetPosture);

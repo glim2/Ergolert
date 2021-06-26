@@ -11,7 +11,7 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-// GET /api/user
+// GET /api/user/:userId
 router.get("/:userId", async (req, res, next) => {
   try {
     const user = await User.findOne({
