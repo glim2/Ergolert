@@ -48,7 +48,7 @@ class Alerts extends React.Component {
     // add all keypoint values together into averagePosture object
     for (let i = 0; i < initialPosture.length; i++) {
       for (let j = 0; j < initialPosture[i].keypoints.length; j++) {
-        if (initialPosture[i].keypoints[j].score > 0.9) {
+        if (initialPosture[i].keypoints[j].score > 0.97) {
           averagePosture.keypoints[j].position.x +=
             initialPosture[i].keypoints[j].position.x;
           averagePosture.keypoints[j].position.y +=
@@ -80,29 +80,17 @@ class Alerts extends React.Component {
           if (currentY === 0) {
             // compared.push(null)
           } else {
-            if (currentY - initialY > 40 && initialX - currentX > 40) {
+            if (currentY - initialY > 30 && initialX - currentX > 50) {
               compared.push("lowRight");
-            } else if (currentY - initialY > 40 && currentX - initialX > 40) {
+            } else if (currentY - initialY > 30 && currentX - initialX > 50) {
               compared.push("lowLeft");
-            } else if (currentY - initialY > 40) {
+            } else if (currentY - initialY > 30) {
               compared.push("low");
-            } else if (
-              initialAveragePosture.keypoints[i].position.y -
-                currentAveragePosture.keypoints[i].position.y >
-              40
-            ) {
+            } else if (initialY - currentY > 30) {
               compared.push("high");
-            } else if (
-              initialAveragePosture.keypoints[i].position.x -
-                currentAveragePosture.keypoints[i].position.x >
-              40
-            ) {
+            } else if (initialX - currentX > 50) {
               compared.push("right");
-            } else if (
-              currentAveragePosture.keypoints[i].position.x -
-                initialAveragePosture.keypoints[i].position.x >
-              40
-            ) {
+            } else if (currentX - initialX > 50) {
               compared.push("left");
             } else {
               compared.push("even");
@@ -110,43 +98,43 @@ class Alerts extends React.Component {
           }
         }
         console.log("compared --> ", compared);
-        if (compared.every((e) => e === "low" || null)) {
-          alertsArray.push("You may be slouching! Time to sit up straight.");
+        if (compared.every((e) => e === "lowRight")) {
+          alertsArray.push(
+            "You may be leaning to the RIGHT. Try to straighten your body."
+          );
           this.setState({
             alerts: alertsArray,
           });
-        } else if (compared.every((e) => e === "high" || null)) {
+        } else if (compared.every((e) => e === "lowLeft")) {
+          alertsArray.push(
+            "You may be leaning to the LEFT. Try to straighten your body."
+          );
+          this.setState({
+            alerts: alertsArray,
+          });
+        } else if (compared.every((e) => e === "high")) {
           alertsArray.push(
             "Are you too close to the screen? Sit back a little!"
           );
           this.setState({
             alerts: alertsArray,
           });
-        } else if (compared.every((e) => e === "right" || null)) {
+        } else if (compared.every((e) => e === "right")) {
           alertsArray.push(
             "I think you are off centered to the RIGHT. Let's move back to the center."
           );
           this.setState({
             alerts: alertsArray,
           });
-        } else if (compared.every((e) => e === "left" || null)) {
+        } else if (compared.every((e) => e === "left")) {
           alertsArray.push(
             "I think you are off centered to the LEFT. Let's move back to the center."
           );
           this.setState({
             alerts: alertsArray,
           });
-        } else if (compared.every((e) => e === "lowRight" || null)) {
-          alertsArray.push(
-            "You may be leaning to the Right. Try to straighten your body."
-          );
-          this.setState({
-            alerts: alertsArray,
-          });
-        } else if (compared.every((e) => e === "lowLeft" || null)) {
-          alertsArray.push(
-            "You may be leaning to the LEFT. Try to straighten your body."
-          );
+        } else if (compared.every((e) => e.includes("low"))) {
+          alertsArray.push("You may be slouching! Time to sit up straight.");
           this.setState({
             alerts: alertsArray,
           });
@@ -167,13 +155,24 @@ class Alerts extends React.Component {
     return (
       <div>
         <div className={classes.root}>
-          <Typography variant="h5" fontWeight="fontWeightBold">Alerts:</Typography>
+          <Typography variant="h5" fontWeight="fontWeightBold">
+            Alerts:
+          </Typography>
           {alertsArray.map((alert) => (
-            <Typography variant="body1" key={alertsArray.indexOf(alert)}>{alert}</Typography>
+            <Typography variant="body2" key={alertsArray.indexOf(alert)}>
+              {alert}
+            </Typography>
           ))}
         </div>
-        <form onClick={this.endSession}>
-          <Button variant="contained" color="primary">End Session</Button>
+        <form className={classes.root}>
+          <Button variant="contained" color="primary">
+            Save Session
+          </Button>
+        </form>
+        <form className={classes.root} onClick={this.endSession}>
+          <Button variant="contained" color="primary">
+             End Session 
+          </Button>
         </form>
       </div>
     );

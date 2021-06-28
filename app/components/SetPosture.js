@@ -46,8 +46,8 @@ class SetPosture extends React.Component {
   }
 
   setInitialPosture(poses) {
-    if (poses.length > 5) {
-      poses = poses.slice(-5);
+    if (poses.length > 10) {
+      poses = poses.slice(-10);
       this.setState({
         initialPosture: poses,
         postureSet: true,
@@ -84,7 +84,7 @@ class SetPosture extends React.Component {
       // add all keypoint values together into averagePosture object
       for (let i = 0; i < initialPosture.length; i++) {
         for (let j = 0; j < initialPosture[i].keypoints.length; j++) {
-          if (initialPosture[i].keypoints[j].score > 0.9) {
+          if (initialPosture[i].keypoints[j].score > 0.97) {
             averagePosture.keypoints[j].position.x +=
               initialPosture[i].keypoints[j].position.x;
             averagePosture.keypoints[j].position.y +=
@@ -117,9 +117,14 @@ class SetPosture extends React.Component {
     if (!this.state.postureSet) {
       return (
         <div>
+          <Typography variant="body1"><strong>Before you begin:</strong></Typography>
+          <Typography variant="body1">Sit up nice and tall</Typography>
+          <Typography variant="body1">Relax your shoulders</Typography>
+          <Typography variant="body1">Click the button below to get started</Typography>
+          <Typography variant="body1">For more information on best posture practices click <a href="https://ergonomictrends.com/creating-perfect-ergonomic-workspace-ultimate-guide/" target="_blank">here</a></Typography>
           <form className={classes.root} onClick={this.handleSetPosture}>
             <Button variant="contained" color="primary">
-              Set Posture
+              Begin
             </Button>
           </form>
         </div>
@@ -128,14 +133,14 @@ class SetPosture extends React.Component {
       if (!this.state.averagePostureSet) {
         return (
           <div>
-            <Typography variant="body1">Your posture is set! Click Begin to start working.</Typography>
+            <Typography variant="body1">Please stay as still as possible until your posture is set</Typography>
             <form className={classes.root}>
               <Button
                 variant="contained"
                 color="primary"
                 onClick={this.handleClick}
               >
-                Begin
+                Set Posture
               </Button>
               <Typography variant="body1">{this.state.pleaseWait}</Typography>
             </form>

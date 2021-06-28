@@ -4,11 +4,20 @@ import * as posenet from "@tensorflow-models/posenet";
 import Webcam from "react-webcam";
 import {drawKeypoints, drawSkeleton} from "../utilities";
 import SetPosture from "./SetPosture";
+import {Grid} from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+  },
+}));
 
 const Video = (props) => {
+  const classes = useStyles(props);
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
-  let poses = []
+  let poses = [];
 
   // Load posenet
   const runPosenet = async () => {
@@ -55,40 +64,50 @@ const Video = (props) => {
   };
 
   return (
-    <div id='webcam'>
-      <Webcam 
-        ref={webcamRef}
-        style={{
-          position: "absolute",
-          marginLeft: "auto",
-          marginRight: "auto",
-          left: 0,
-          right: 0,
-          textAlign: "center",
-          zindex: 9,
-          width: 640,
-          height: 480,
-        }}
-      />
+    <Grid container direction="row" justify="space-between" className={classes.root}>
+      <Grid item>
+        <div>
+          <SetPosture
+            runPosenet={() => runPosenet()}
+            poses={poses}
+            auth={props.auth}
+          />
+        </div>
+      </Grid>
+      <Grid item>
+        <div id="webcam">
+          <Webcam
+            ref={webcamRef}
+            style={{
+              position: "absolute",
+              marginLeft: "auto",
+              marginRight: "auto",
+              left: 0,
+              right: 0,
+              textAlign: "center",
+              zindex: 9,
+              width: 640,
+              height: 480,
+            }}
+          />
 
-      <canvas 
-        ref={canvasRef}
-        style={{
-          position: "absolute",
-          marginLeft: "auto",
-          marginRight: "auto",
-          left: 0,
-          right: 0,
-          textAlign: "center",
-          zindex: 9,
-          width: 640,
-          height: 480,
-        }}
-      />
-      <div>
-        <SetPosture runPosenet={() => runPosenet()} poses={poses} auth={props.auth} />
-      </div>
-    </div>
+          <canvas
+            ref={canvasRef}
+            style={{
+              position: "absolute",
+              marginLeft: "auto",
+              marginRight: "auto",
+              left: 0,
+              right: 0,
+              textAlign: "center",
+              zindex: 9,
+              width: 640,
+              height: 480,
+            }}
+          />
+        </div>
+      </Grid>
+    </Grid>
   );
 };
 
