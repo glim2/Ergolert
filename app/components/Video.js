@@ -25,9 +25,10 @@ const Video = (props) => {
       inputResolution: {width: 640, height: 480},
       scale: 0.5,
     });
-    setInterval(() => {
-      detect(net);
-    }, 600);
+    // setInterval(() => {
+    //   detect(net);
+    // }, 600);
+    detect(net)
   };
 
   const detect = async (net) => {
@@ -48,6 +49,10 @@ const Video = (props) => {
       // Make Detections
       const pose = await net.estimateSinglePose(video);
       console.log(pose);
+
+      requestAnimationFrame(async () => {
+        await detect(net)
+      })
 
       drawCanvas(pose, video, videoWidth, videoHeight, canvasRef);
       poses.push(pose);
