@@ -22,87 +22,35 @@ class SetPosture extends React.Component {
       averagePostureSet: false,
       pleaseWait: "",
     };
-    this.handleSetPosture = this.handleSetPosture.bind(this);
+    this.handleBegin = this.handleBegin.bind(this);
     this.handleResetPosture = this.handleResetPosture.bind(this);
     this.handleClick = this.handleClick.bind(this);
   }
 
-  handleSetPosture(evt) {
+  handleBegin(evt) {
     evt.preventDefault();
-    if (!this.state.runPosenet) {
-      this.props.runPosenet();
-    }
+    // if (!this.state.runPosenet) {
+    //   this.props.runPosenet();
+    // }
+    this.props.init()
     this.setInitialPosture(this.props.poses);
+  }
+
+  setInitialPosture(poses) {
+    if (poses.length > 10) {
+      poses = poses.slice(-10);
+    }
+    this.setState({initialPosture: poses, runPosenet: true, postureSet: true});
   }
 
   handleResetPosture(evt) {
     evt.preventDefault();
     this.setState({
       initialPosture: [],
-      postureSet: false,
+      // postureSet: false,
       averagePostureSet: false,
       pleaseWait: "",
     });
-  }
-
-  setInitialPosture(poses) {
-    if (poses.length > 10) {
-      poses = poses.slice(-10);
-      this.setState({
-        initialPosture: poses,
-        postureSet: true,
-        runPosenet: true,
-      });
-    }
-    this.setState({initialPosture: poses, postureSet: true, runPosenet: true});
-  }
-
-  getInitialAveragePosture(initialPosture) {
-    // create knew averagePosture object to store average position values
-    let averagePosture = {
-      keypoints: [
-        {part: "nose", position: {x: 0, y: 0}},
-        {part: "leftEye", position: {x: 0, y: 0}},
-        {part: "rightEye", position: {x: 0, y: 0}},
-        {part: "leftEar", position: {x: 0, y: 0}},
-        {part: "rightEar", position: {x: 0, y: 0}},
-        {part: "leftShoulder", position: {x: 0, y: 0}},
-        {part: "rightShoulder", position: {x: 0, y: 0}},
-        {part: "leftElbow", position: {x: 0, y: 0}},
-        {part: "rightElbow", position: {x: 0, y: 0}},
-        {part: "leftWrist", position: {x: 0, y: 0}},
-        {part: "rightWrist", position: {x: 0, y: 0}},
-        {part: "leftHip", position: {x: 0, y: 0}},
-        {part: "rightHip", position: {x: 0, y: 0}},
-        {part: "leftKnee", position: {x: 0, y: 0}},
-        {part: "rightKnee", position: {x: 0, y: 0}},
-        {part: "leftAnkle", position: {x: 0, y: 0}},
-        {part: "rightAnkle", position: {x: 0, y: 0}},
-      ],
-    };
-    setTimeout(() => {
-      // add all keypoint values together into averagePosture object
-      for (let i = 0; i < initialPosture.length; i++) {
-        for (let j = 0; j < initialPosture[i].keypoints.length; j++) {
-          if (initialPosture[i].keypoints[j].score > 0.97) {
-            averagePosture.keypoints[j].position.x +=
-              initialPosture[i].keypoints[j].position.x;
-            averagePosture.keypoints[j].position.y +=
-              initialPosture[i].keypoints[j].position.y;
-          }
-        }
-      }
-      // map through each keypoint and divide by initialPosture.length to get average values
-      averagePosture.keypoints.map((keypoint) => {
-        keypoint.position.x = keypoint.position.x / initialPosture.length;
-        keypoint.position.y = keypoint.position.y / initialPosture.length;
-        return keypoint;
-      });
-      this.setState({
-        initialAveragePosture: averagePosture,
-        averagePostureSet: true,
-      });
-    }, 5000);
   }
 
   handleClick() {
@@ -111,7 +59,58 @@ class SetPosture extends React.Component {
     });
     this.getInitialAveragePosture(this.state.initialPosture);
   }
-
+  
+  getInitialAveragePosture(initialPosture) {
+    // create knew averagePosture object to store average position values
+    let averagePosture = {
+      keypoints: [
+        {y: 0, x: 0, score: 0, name: "nose"},
+        {y: 0, x: 0, score: 0, name: "leftEye"},
+        {y: 0, x: 0, score: 0, name: "rightEye"},
+        {y: 0, x: 0, score: 0, name: "leftEar"},
+        {y: 0, x: 0, score: 0, name: "rightEar"},
+        {y: 0, x: 0, score: 0, name: "leftShoulder"},
+        {y: 0, x: 0, score: 0, name: "rightShoulder"},
+        {y: 0, x: 0, score: 0, name: "leftElbow"},
+        {y: 0, x: 0, score: 0, name: "rightElbow"},
+        {y: 0, x: 0, score: 0, name: "leftWrist"},
+        {y: 0, x: 0, score: 0, name: "rightWrist"},
+        {y: 0, x: 0, score: 0, name: "leftHip"},
+        {y: 0, x: 0, score: 0, name: "rightHip"},
+        {y: 0, x: 0, score: 0, name: "leftKnee"},
+        {y: 0, x: 0, score: 0, name: "rightKnee"},
+        {y: 0, x: 0, score: 0, name: "leftAnkle"},
+        {y: 0, x: 0, score: 0, name: "rightAnkle"},
+      ],
+    };
+    setTimeout(() => {
+      // add all keypoint values together into averagePosture object
+      for (let i = 0; i < initialPosture.length; i++) {
+        for (let j = 0; j < initialPosture[i].keypoints.length; j++) {
+          if (initialPosture[i].keypoints[j].score > 0.50) {
+            averagePosture.keypoints[j].x +=
+              initialPosture[i].keypoints[j].x;
+            averagePosture.keypoints[j].y +=
+              initialPosture[i].keypoints[j].y;
+            averagePosture.keypoints[j].score += 
+              initialPosture[i].keypoints[j].score;
+          }
+        }
+      }
+      // map through each keypoint and divide by initialPosture.length to get average values
+      averagePosture.keypoints.map((keypoint) => {
+        keypoint.x = keypoint.x / initialPosture.length;
+        keypoint.y = keypoint.y / initialPosture.length;
+        keypoint.score = keypoint.score / initialPosture.length;
+        return keypoint;
+      });
+      this.setState({
+        initialAveragePosture: averagePosture,
+        averagePostureSet: true,
+      });
+    }, 5000);
+  }
+  
   render() {
     const {classes} = this.props;
     if (!this.state.postureSet) {
@@ -122,7 +121,7 @@ class SetPosture extends React.Component {
           <Typography variant="body1">Relax your shoulders</Typography>
           <Typography variant="body1">Click the button below to get started</Typography>
           <Typography variant="body1">For more information on best posture practices click <a href="https://ergonomictrends.com/creating-perfect-ergonomic-workspace-ultimate-guide/" target="_blank">here</a></Typography>
-          <form className={classes.root} onClick={this.handleSetPosture}>
+          <form className={classes.root} onClick={this.handleBegin}>
             <Button variant="contained" color="primary">
               Begin
             </Button>

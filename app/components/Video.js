@@ -1,8 +1,8 @@
 import React, {useRef} from "react";
-import * as tf from "@tensorflow/tfjs";
-import * as posenet from "@tensorflow-models/posenet";
+import * as poseDetection from "@tensorflow-models/pose-detection";
+import "@tensorflow/tfjs-backend-webgl";
+// import "@tensorflow/tfjs-backend-wasm";
 import Webcam from "react-webcam";
-import {drawKeypoints, drawSkeleton} from "../utilities";
 import SetPosture from "./SetPosture";
 import {Grid} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
@@ -19,19 +19,28 @@ const Video = (props) => {
   const canvasRef = useRef(null);
   let poses = [];
 
-  // Load posenet
-  const runPosenet = async () => {
-    const net = await posenet.load({
-      inputResolution: {width: 640, height: 480},
-      scale: 0.5,
-    });
-    // setInterval(() => {
-    //   detect(net);
-    // }, 600);
-    detect(net)
-  };
+  // Load Posenet
+  // const runPosenet = async () => {
+    //   const net = await posenet.load({
+      //     inputResolution: {width: 640, height: 480},
+      //     scale: 0.5,
+      //   });
+      //   detect(net)
+      // };
+      
+  // Load movenet
+  const init = async () => {
+    const detectorConfig = {
+      modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER,
+    }
+    const detector = await poseDetection.createDetector(
+      poseDetection.SupportedModels.MoveNet,
+      detectorConfig
+    )
+    detect(detector)
+  }
 
-  const detect = async (net) => {
+  const detect = async (detector) => {
     if (
       typeof webcamRef.current !== "undefined" &&
       webcamRef.current !== null &&
@@ -47,32 +56,71 @@ const Video = (props) => {
       webcamRef.current.video.height = videoHeight;
 
       // Make Detections
-      const pose = await net.estimateSinglePose(video);
+      let pose = await detector.estimatePoses(video);
       console.log(pose);
 
       requestAnimationFrame(async () => {
-        await detect(net)
+        await detect(detector)
       })
 
-      drawCanvas(pose, video, videoWidth, videoHeight, canvasRef);
-      poses.push(pose);
+      drawCanvas(pose, videoWidth, videoHeight, canvasRef);
+      poses.push(pose[0])
+      while (poses.length > 100) {
+        poses.shift()
+      }
     }
   };
 
-  const drawCanvas = (pose, video, videoWidth, videoHeight, canvas) => {
-    const ctx = canvas.current.getContext("2d");
+   const drawKeypoint = (keypoint) => {
+    const ctx = canvasRef.current.getContext("2d");
+    // If score is null, just show the keypoint.
+    const confidence = keypoint.score != null ? keypoint.score : 1;
+    const scoreThreshold = 0.3 || 0;
+
+    if (confidence >= scoreThreshold) {
+      const circle = new Path2D();
+      circle.arc(keypoint.x, keypoint.y, 4, 0, 2 * Math.PI);
+      ctx.fill(circle);
+      ctx.stroke(circle);
+    }
+  }
+
+  const drawKeypoints = (keypoints) => {
+    const ctx = canvasRef.current.getContext("2d");
+    const keypointInd = poseDetection.util.getKeypointIndexBySide("MoveNet");
+    ctx.fillStyle = "White";
+    ctx.strokeStyle = "White";
+    ctx.lineWidth = 2;
+
+    //middle points will be white (just nose)
+    for (const i of keypointInd.middle) {
+      drawKeypoint(keypoints[i]);
+    }
+    //left points will be green... note your actual left side (technically right side when looking at video)
+    ctx.fillStyle = "Green";
+    for (const i of keypointInd.left) {
+      drawKeypoint(keypoints[i]);
+    }
+    //right points will be orange... note your actual right side (technically left side when looking at video)
+    ctx.fillStyle = "Orange";
+    for (const i of keypointInd.right) {
+      drawKeypoint(keypoints[i]);
+    }
+  }
+
+  const drawCanvas = (poses, videoWidth, videoHeight, canvas) => {
     canvas.current.width = videoWidth;
     canvas.current.height = videoHeight;
 
-    drawKeypoints(pose["keypoints"], 0.5, ctx);
-    drawSkeleton(pose["keypoints"], 0.5, ctx);
-  };
+    drawKeypoints(poses[0].keypoints);
+  }
 
   return (
     <Grid container direction="row" justify="space-between" className={classes.root}>
       <Grid item>
         <div>
           <SetPosture
+            init={() => init()}
             runPosenet={() => runPosenet()}
             poses={poses}
             auth={props.auth}

@@ -26,40 +26,41 @@ class Alerts extends React.Component {
     // create knew averagePosture object to store average position values
     let averagePosture = {
       keypoints: [
-        {part: "nose", position: {x: 0, y: 0}},
-        {part: "leftEye", position: {x: 0, y: 0}},
-        {part: "rightEye", position: {x: 0, y: 0}},
-        {part: "leftEar", position: {x: 0, y: 0}},
-        {part: "rightEar", position: {x: 0, y: 0}},
-        {part: "leftShoulder", position: {x: 0, y: 0}},
-        {part: "rightShoulder", position: {x: 0, y: 0}},
-        {part: "leftElbow", position: {x: 0, y: 0}},
-        {part: "rightElbow", position: {x: 0, y: 0}},
-        {part: "leftWrist", position: {x: 0, y: 0}},
-        {part: "rightWrist", position: {x: 0, y: 0}},
-        {part: "leftHip", position: {x: 0, y: 0}},
-        {part: "rightHip", position: {x: 0, y: 0}},
-        {part: "leftKnee", position: {x: 0, y: 0}},
-        {part: "rightKnee", position: {x: 0, y: 0}},
-        {part: "leftAnkle", position: {x: 0, y: 0}},
-        {part: "rightAnkle", position: {x: 0, y: 0}},
+        {y: 0, x: 0, score: 0, name: "nose"},
+        {y: 0, x: 0, score: 0, name: "leftEye"},
+        {y: 0, x: 0, score: 0, name: "rightEye"},
+        {y: 0, x: 0, score: 0, name: "leftEar"},
+        {y: 0, x: 0, score: 0, name: "rightEar"},
+        {y: 0, x: 0, score: 0, name: "leftShoulder"},
+        {y: 0, x: 0, score: 0, name: "rightShoulder"},
+        {y: 0, x: 0, score: 0, name: "leftElbow"},
+        {y: 0, x: 0, score: 0, name: "rightElbow"},
+        {y: 0, x: 0, score: 0, name: "leftWrist"},
+        {y: 0, x: 0, score: 0, name: "rightWrist"},
+        {y: 0, x: 0, score: 0, name: "leftHip"},
+        {y: 0, x: 0, score: 0, name: "rightHip"},
+        {y: 0, x: 0, score: 0, name: "leftKnee"},
+        {y: 0, x: 0, score: 0, name: "rightKnee"},
+        {y: 0, x: 0, score: 0, name: "leftAnkle"},
+        {y: 0, x: 0, score: 0, name: "rightAnkle"},
       ],
     };
     // add all keypoint values together into averagePosture object
     for (let i = 0; i < initialPosture.length; i++) {
       for (let j = 0; j < initialPosture[i].keypoints.length; j++) {
-        if (initialPosture[i].keypoints[j].score > 0.97) {
-          averagePosture.keypoints[j].position.x +=
-            initialPosture[i].keypoints[j].position.x;
-          averagePosture.keypoints[j].position.y +=
-            initialPosture[i].keypoints[j].position.y;
+        if (initialPosture[i].keypoints[j].score > 0.50) {
+          averagePosture.keypoints[j].x += initialPosture[i].keypoints[j].x;
+          averagePosture.keypoints[j].y += initialPosture[i].keypoints[j].y;
+          averagePosture.keypoints[j].score +=
+            initialPosture[i].keypoints[j].score;
         }
       }
     }
     // map through each keypoint and divide by initialPosture.length to get average values
     averagePosture.keypoints.map((keypoint) => {
-      keypoint.position.x = keypoint.position.x / initialPosture.length;
-      keypoint.position.y = keypoint.position.y / initialPosture.length;
+      keypoint.x = keypoint.x / initialPosture.length;
+      keypoint.y = keypoint.y / initialPosture.length;
+      keypoint.score = keypoint.score / initialPosture.length;
       return keypoint;
     });
     return averagePosture;
@@ -69,14 +70,15 @@ class Alerts extends React.Component {
     if (this.props.auth.id !== undefined) {
       setInterval(() => {
         let compared = [];
+        console.log('poses --> ', poses)
         const currentAveragePosture = this.getAveragePosture(poses.slice(-10));
         console.log("initial", initialAveragePosture);
         console.log("current", currentAveragePosture.keypoints);
         for (let i = 0; i < currentAveragePosture.keypoints.length; i++) {
-          let currentY = currentAveragePosture.keypoints[i].position.y;
-          let currentX = currentAveragePosture.keypoints[i].position.x;
-          let initialY = initialAveragePosture.keypoints[i].position.y;
-          let initialX = initialAveragePosture.keypoints[i].position.x;
+          let currentY = currentAveragePosture.keypoints[i].y;
+          let currentX = currentAveragePosture.keypoints[i].x;
+          let initialY = initialAveragePosture.keypoints[i].y;
+          let initialX = initialAveragePosture.keypoints[i].x;
           if (currentY === 0) {
             // compared.push(null)
           } else {
@@ -171,7 +173,7 @@ class Alerts extends React.Component {
         </form>
         <form className={classes.root} onClick={this.endSession}>
           <Button variant="contained" color="primary">
-             End Session 
+            End Session
           </Button>
         </form>
       </div>
